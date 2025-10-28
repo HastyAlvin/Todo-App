@@ -1,25 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+/** @jsxImportSource theme-ui */
+import React from "react";
+import { Box, Heading } from "theme-ui";
+import TodoList from "./components/TodoList";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Box sx={{ textAlign: "center", mt: 4 }}>
+      <Heading as="h1" sx={{ color: "#b83f45", fontSize: 80, fontWeight: 100 }}>
+        todos
+      </Heading>
+      <TodoList />
+    </Box>
   );
 }
-
+// tách riêng component ra để thấy sự tyuongw tác giữa cac component với nhau
+// Tìm hiểu các keyword bổ sung: map, filter, spread operator(...)
 export default App;
