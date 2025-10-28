@@ -1,28 +1,25 @@
 /** @jsxImportSource theme-ui */
 import React from "react";
-import { Box, Input, Flex, Button, Text } from "theme-ui";
+import { Box, Flex, Button, Text } from "theme-ui";
 import TodoItem from "./TodoItem";
+import TodoInput from "./TodoInput";
 
 export default class TodoList extends React.Component {
     state = {  //state lưu dữ liệu của component
         todos: [],   // mảng lưu danh sách công việc
-        inputValue: "",  // giá trị gõ trong imput
         filter: "all",   //filter default là all
     };
 
     //Thêm todo
-    handleAddTodo = (e) => {
-        if (e.key === "Enter" && this.state.inputValue.trim() !== "") {
-            const newTodo = {
-                id: Date.now(),
-                text: this.state.inputValue.trim(),
-                completed: false,
-            };
-            this.setState({ // cập nhật lại danh sách
-                todos: [newTodo, ...this.state.todos], //spread operator(...) để copy toàn bộ phần tử trong mảng todos rồi thêm newTodo vào cuối mảng
-                inputValue: "",
-            });
-        }
+    handleAddTodo = (text) => {
+        const newTodo = {
+            id: Date.now(),
+            text,
+            completed: false,
+        };
+        this.setState({
+            todos: [newTodo, ...this.state.todos],
+        });
     };
 
     //CHuyển trạng thái hoàn thành
@@ -76,21 +73,9 @@ export default class TodoList extends React.Component {
                     borderRadius: "6px",
                 }}
             >
-                <Input
-                    placeholder="What needs to be done?"
-                    value={this.state.inputValue}
-                    onChange={(e) => this.setState({ inputValue: e.target.value })}
-                    onKeyDown={this.handleAddTodo}
-                    sx={{
-                        border: "none",
-                        borderBottom: "1px solid #e6e6e6",
-                        px: 3,
-                        py: 3,
-                        fontSize: 18,
-                        "::placeholder": { color: "gray" },
-                    }}
-                />
-                 {/* phương thức map() chỉ dùng với array và trả lại một mảng mới hoàn toàn */}
+                <TodoInput onAdd={this.handleAddTodo} /> {/* ✅ tách riêng input */}
+
+                {/* phương thức map() chỉ dùng với array và trả lại một mảng mới hoàn toàn */}
                 {filteredTodos.map((todo) => (
                     <TodoItem  //truyền các giá trị vào props
                         key={todo.id}
