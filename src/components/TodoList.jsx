@@ -1,16 +1,17 @@
 /** @jsxImportSource theme-ui */
 import React from "react";
-import { Box, Flex, Button, Text } from "theme-ui";
+import { Box, Text, Heading } from "theme-ui";
 import TodoItem from "./TodoItem";
 import TodoInput from "./TodoInput";
-
+import TodoAction from "./TodoAction";
+import { ThemeContext } from "../context/ThemeContext";
 export default class TodoList extends React.Component {
-    state = {  //state lưu dữ liệu của component
-        todos: [],   // mảng lưu danh sách công việc
-        filter: "all",   //filter default là all
+    state = {
+        todos: [],
+        filter: "all",
+        editingTodo: null,
     };
 
-    //Thêm todo
     handleAddTodo = (text) => {
         const newTodo = {
             id: Date.now(),
@@ -22,110 +23,140 @@ export default class TodoList extends React.Component {
         });
     };
 
-    //CHuyển trạng thái hoàn thành
-    handleToggle = (id) => {
-        this.setState({ // cập nhật lại danh sách
+    handleUpdateTodo = (id, text) => {
+        this.setState({
+            todos: this.state.todos.map((t) =>
+                t.id === id ? { ...t, text } : t
+            ),
+            editingTodo: null,
+        });
+    };
+
+    handleToggleTodo = (id) => {
+        this.setState({
             todos: this.state.todos.map((t) =>
                 t.id === id ? { ...t, completed: !t.completed } : t
             ),
         });
     };
 
-    // Xoá công việc 
-    handleDelete = (id) => {
-        this.setState({ // cập nhật lại danh sách
+    handleDeleteTodo = (id) => {
+        this.setState({
             todos: this.state.todos.filter((t) => t.id !== id),
+            editingTodo: this.state.editingTodo?.id === id ? null : this.state.editingTodo,
         });
     };
 
-    //Lọc công việc
-    handleFilterChange = (filter) => {
-        this.setState({ filter }); // cập nhật lại danh sách
+    handleEditInInput = (todo) => {
+        this.setState({ editingTodo: todo });
     };
 
-    //Xoá công việc hoàn thành
+    handleCancelEdit = () => {
+        this.setState({ editingTodo: null });
+    };
+
+    handleFilterChange = (filter) => {
+        this.setState({ filter });
+    };
+
     handleClearCompleted = () => {
         this.setState({
-            todos: this.state.todos.filter((t) => !t.completed), // cập nhật lại danh sách
+            todos: this.state.todos.filter((t) => !t.completed),
         });
     };
 
-    //Lấy danh sách theo filter
     getFilteredTodos = () => {
-        const { todos, filter } = this.state; //lấy giá trị từ state đã khai báo
-        if (filter === "active") return todos.filter((t) => !t.completed); //completed = false
-        if (filter === "completed") return todos.filter((t) => t.completed);//completed = true
+        const { todos, filter } = this.state;
+        if (filter === "active") return todos.filter((t) => !t.completed);
+        if (filter === "completed") return todos.filter((t) => t.completed);
         return todos;
     };
 
     render() {
-        const filteredTodos = this.getFilteredTodos();
-        const activeCount = this.state.todos.filter((t) => !t.completed).length; // độ dài của mảng có completed = false
+        const { editingTodo, todos, filter } = this.state;
+        const filteredTodos = this.getFilteredTodos(); // ✅ Tính từ state
+        const activeCount = todos.filter((t) => !t.completed).length;
 
         return (
-            <Box
-                sx={{
-                    width: "400px",
-                    mx: "auto",
-                    mt: 5,
-                    boxShadow: "md",
-                    bg: "white",
-                    borderRadius: "6px",
-                }}
-            >
-                <TodoInput onAdd={this.handleAddTodo} /> {/* ✅ tách riêng input */}
-
-                {/* phương thức map() chỉ dùng với array và trả lại một mảng mới hoàn toàn */}
-                {filteredTodos.map((todo) => (
-                    <TodoItem  //truyền các giá trị vào props
-                        key={todo.id}
-                        todo={todo}
-                        onToggle={this.handleToggle}
-                        onDelete={this.handleDelete}
-                    />
-                ))}
-
-                {this.state.todos.length > 0 && (
-                    <Flex
+            <ThemeContext.Consumer>
+                {({ theme }) => (
+                    <Box
                         sx={{
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            borderTop: "1px solid #e6e6e6",
-                            px: 3,
-                            py: 2,
-                            fontSize: 14,
+                            width: "100%",
+                            maxWidth: "40rem",
+                            mx: "auto",
+                            mt: 12,
+                            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
+                            bg: theme === "dark" ? "#374151" : "white",
+                            borderRadius: "12px",
+                            overflow: "hidden",
+                            color: theme === "dark" ? "#f9fafb" : "#111827",
                         }}
                     >
-                        <Text>
-                            {activeCount} item{activeCount !== 1 ? "s" : ""} left
-                        </Text>
-                        <Flex sx={{ gap: 2 }}>
-                            {["all", "active", "completed"].map((f) => (
-                                <Button
-                                    key={f}
-                                    onClick={() => this.handleFilterChange(f)}
-                                    sx={{
-                                        px: 2,
-                                        py: 1,
-                                        fontSize: 13,
-                                        border: "1px solid #ddd",
-                                        bg: this.state.filter === f ? "#f2f2f2" : "transparent",
-                                        color: this.state.filter === f ? "black" : "gray",
-                                    }}
-                                >
-                                    {f.charAt(0).toUpperCase() + f.slice(1)}
-                                </Button>
-                            ))}
-                        </Flex>
-                        <Button
-                            onClick={this.handleClearCompleted}
-                            sx={{ fontSize: 13, color: "gray", bg: "transparent" }}
+                        {/* Title */}
+                        <Heading
+                            as="h1"
+                            sx={{
+                                fontSize: "8xl",
+                                fontWeight: "100",
+                                color: "#ef4444",
+
+                            }}
                         >
-                            Clear completed
-                        </Button>
-                    </Flex>
+                            todos
+                        </Heading>
+
+                        {/* Main container */}
+                        <Box
+                            sx={{
+                                width: "100%",
+                                maxWidth: "40rem", // ~max-w-xl
+                                mx: "auto",
+                                boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
+                                bg: "white",
+                                borderRadius: "12px",
+                                overflow: "hidden",
+                            }}
+                        >
+                            <TodoInput
+                                onAdd={this.handleAddTodo}
+                                onUpdate={this.handleUpdateTodo}
+                                onCancelEdit={this.handleCancelEdit}
+                                editingTodo={editingTodo}
+                            />
+
+                            {filteredTodos.map((todo) => (
+                                <TodoItem
+                                    key={todo.id}
+                                    todo={todo}
+                                    onToggle={this.handleToggleTodo}
+                                    onDelete={this.handleDeleteTodo}
+                                    onUpdate={this.handleUpdateTodo}
+                                    onEditInInput={this.handleEditInInput}
+                                />
+                            ))}
+
+                            {todos.length > 0 && (
+                                <TodoAction
+                                    activeCount={activeCount}
+                                    filter={filter}
+                                    onFilterChange={this.handleFilterChange}
+                                    onClearCompleted={this.handleClearCompleted}
+                                />
+                            )}
+                        </Box>
+
+                        {/* Footer instructions */}
+                        <Box sx={{ fontSize: 1 }}>
+                            <Text sx={{ mb: 1, display: "block" }}>
+                                Double-click để edit trực tiếp
+                            </Text>
+                            <Text>Click icon Edit để edit ở Input trên</Text>
+                        </Box>
+                    </Box>
                 )}
-            </Box>
+            </ThemeContext.Consumer>
         );
     }
+
 }

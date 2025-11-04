@@ -1,18 +1,34 @@
 /** @jsxImportSource theme-ui */
 import React from "react";
-import { Box, Heading } from "theme-ui";
+import { Box } from "theme-ui";
 import TodoList from "./components/TodoList";
+import ThemeProvider, { ThemeContext } from "./context/ThemeContext";
+import ThemeToggleButton from "./components/ThemeToggleButton";
 
-function App() {
+export default function App() {
   return (
-    <Box sx={{ textAlign: "center", mt: 4 }}>
-      <Heading as="h1" sx={{ color: "#b83f45", fontSize: 80, fontWeight: 100 }}>
-        todos
-      </Heading>
-      <TodoList />
-    </Box>
+    <ThemeProvider>
+      <ThemeContext.Consumer>
+        {({ theme }) => (
+          <Box
+            sx={{
+              textAlign: "center",
+              mt: 6,
+              transition: "background-color 0.3s ease, color 0.3s ease",
+              bg: theme === "dark" ? "#1f2937" : "#f9fafb",
+              color: theme === "dark" ? "#f3f4f6" : "#111827",
+            }}
+          >
+            <ThemeToggleButton />
+            <TodoList />
+          </Box>
+        )}
+      </ThemeContext.Consumer>
+    </ThemeProvider>
   );
 }
+//Tách riêng các phần xử lý ngoài việc list ra khỏi TodoList, xử lý state của Todoitem để giảm tải cho TodoList
 // tách riêng component ra để thấy sự tyuongw tác giữa cac component với nhau
-// Tìm hiểu các keyword bổ sung: map, filter, spread operator(...)
-export default App;
+// Bổ sung dark mode/light mode
+//Thêm chức năng Edit (liên quan Ref(reference))
+//Bổ sung tính năng pagination (phân trang) (tối đa 5 item)
