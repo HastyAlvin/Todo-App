@@ -1,11 +1,11 @@
 /** @jsxImportSource theme-ui */
 import React from "react";
-import { Flex, Box, Input, Button,Text } from "theme-ui";
+import { Flex, Box, Input, Button, Text } from "theme-ui";
 import { X, Edit2, Check, XCircle } from "lucide-react";
 
 export default class TodoItem extends React.Component {
 
- constructor(props) {
+  constructor(props) {
     super(props);
     this.editInputRef = React.createRef();
     this.state = {
@@ -29,7 +29,8 @@ export default class TodoItem extends React.Component {
   };
 
   handleEditInInput = () => {
-    this.props.onEditInInput(this.props.todo);
+    const idx = this.props.idx
+    this.props.onEditInInput(this.props.todo, idx);
   };
 
   handleEditChange = (e) => {
@@ -60,8 +61,8 @@ export default class TodoItem extends React.Component {
   render() {
     const { todo } = this.props;
     const { isEditingInline, editValue } = this.state;
-  return (
-         <Box
+    return (
+      <Box
         sx={{
           display: "flex",
           alignItems: "center",

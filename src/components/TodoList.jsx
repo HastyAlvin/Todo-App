@@ -10,6 +10,8 @@ export default class TodoList extends React.Component {
         todos: [],
         filter: "all",
         editingTodo: null,
+        currentPage: 1, //  trang hiện tại
+        itemsPerPage: 5, //  số todo mỗi trang
     };
 
     handleAddTodo = (text) => {
@@ -23,11 +25,22 @@ export default class TodoList extends React.Component {
         });
     };
 
-    handleUpdateTodo = (id, text) => {
+    handleUpdateTodo = (idx, text) => {
+        // this.setState({
+        //     todos: this.state.todos.map((t) =>
+        //         t.id === id ? { ...t, text } : t
+        //     ),
+        //     editingTodo: null,
+        // });
+        // const newTodos = this.state.todos.map((t, index) => {
+        //     return idx === index ? { ...t, text } : t
+        // })
+
+        this.state.todos[this.idx].text = text;
+        const newTodos = this.state.todos;
+
         this.setState({
-            todos: this.state.todos.map((t) =>
-                t.id === id ? { ...t, text } : t
-            ),
+            todos: newTodos,
             editingTodo: null,
         });
     };
@@ -43,12 +56,14 @@ export default class TodoList extends React.Component {
     handleDeleteTodo = (id) => {
         this.setState({
             todos: this.state.todos.filter((t) => t.id !== id),
-            editingTodo: this.state.editingTodo?.id === id ? null : this.state.editingTodo,
+            editingTodo:
+                this.state.editingTodo?.id === id ? null : this.state.editingTodo,
         });
     };
 
-    handleEditInInput = (todo) => {
+    handleEditInInput = (todo, idx) => {
         this.setState({ editingTodo: todo });
+        this.idx = idx;
     };
 
     handleCancelEdit = () => {
@@ -72,11 +87,37 @@ export default class TodoList extends React.Component {
         return todos;
     };
 
+    // --- Pagination handlers ---
+    goToNextPage = () => {
+        const totalPages = Math.ceil(
+            this.getFilteredTodos().length / this.state.itemsPerPage
+        );
+        this.setState((prev) => ({
+            currentPage: Math.min(prev.currentPage + 1, totalPages),
+        }));
+    };
+
+    goToPrevPage = () => {
+        this.setState((prev) => ({
+            currentPage: Math.max(prev.currentPage - 1, 1),
+        }));
+    };
+
+    goToSpecificPage = (page) => {
+        this.setState({ currentPage: page });
+    };
     render() {
         const { editingTodo, todos, filter } = this.state;
-        const filteredTodos = this.getFilteredTodos(); // ✅ Tính từ state
+        // const filteredTodos = this.getFilteredTodos(); // ✅ Tính từ state
         const activeCount = todos.filter((t) => !t.completed).length;
 
+        const filteredTodos = this.getFilteredTodos();
+        const totalPages = Math.ceil(
+            filteredTodos.length / this.state.itemsPerPage
+        );
+        const startIndex = (this.state.currentPage - 1) * this.state.itemsPerPage;
+        const endIndex = startIndex + this.state.itemsPerPage;
+        const currentTodos = filteredTodos.slice(startIndex, endIndex);
         return (
             <ThemeContext.Consumer>
                 {({ theme }) => (
@@ -100,7 +141,6 @@ export default class TodoList extends React.Component {
                                 fontSize: "8xl",
                                 fontWeight: "100",
                                 color: "#ef4444",
-
                             }}
                         >
                             todos
@@ -124,9 +164,16 @@ export default class TodoList extends React.Component {
                                 onCancelEdit={this.handleCancelEdit}
                                 editingTodo={editingTodo}
                             />
-
-                            {filteredTodos.map((todo) => (
+                            {/* <TodoInput2
+                                todos={todos}
+                                handleToggleTodo={this.handleToggleTodo}
+                                handleDeleteTodo={this.handleDeleteTodo}
+                                handleUpdateTodo={this.handleUpdateTodo}
+                                handleEditInInput={this.handleEditInInput}
+                            /> */}
+                            {currentTodos.map((todo, idx) => (
                                 <TodoItem
+                                    idx={idx}
                                     key={todo.id}
                                     todo={todo}
                                     onToggle={this.handleToggleTodo}
@@ -135,7 +182,43 @@ export default class TodoList extends React.Component {
                                     onEditInInput={this.handleEditInInput}
                                 />
                             ))}
+                            {filteredTodos.length > 0 && (
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        gap: 2,
+                                        p: 3,
+                                    }}
+                                >
+                                    <button
+                                        onClick={this.goToPrevPage}
+                                        disabled={this.state.currentPage === 1}
+                                    >
+                                        Prev
+                                    </button>
 
+                                    {Array.from({ length: totalPages }, (_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => this.goToSpecificPage(i + 1)}
+                                            style={{
+                                                fontWeight:
+                                                    this.state.currentPage === i + 1 ? "bold" : "normal",
+                                            }}
+                                        >
+                                            {i + 1}
+                                        </button>
+                                    ))}
+
+                                    <button
+                                        onClick={this.goToNextPage}
+                                        disabled={this.state.currentPage === totalPages}
+                                    >
+                                        Next
+                                    </button>
+                                </Box>
+                            )}
                             {todos.length > 0 && (
                                 <TodoAction
                                     activeCount={activeCount}
@@ -158,5 +241,4 @@ export default class TodoList extends React.Component {
             </ThemeContext.Consumer>
         );
     }
-
 }

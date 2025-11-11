@@ -32,3 +32,6 @@ export default function App() {
 // Bổ sung dark mode/light mode
 //Thêm chức năng Edit (liên quan Ref(reference))
 //Bổ sung tính năng pagination (phân trang) (tối đa 5 item)
+// PureComponent: so sánh nông. Khi props hoặc state thay đổi thì mới render lại component
+// Nguyên tắc khi thay đổi state. Thế nào là một state mới ? 
+// Mọi logic triển khai thay đổi component thay đổi reference của từng biến từng field cần phải kiểm soát hết.
