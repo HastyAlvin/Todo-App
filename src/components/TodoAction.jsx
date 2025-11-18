@@ -2,13 +2,6 @@
 import React from "react";
 import { Flex, Button, Text } from "theme-ui";
 
-
-const STATE_FILTER = {
-  ALL: "all",
-  ACTIVE: "active",
-  COMPLETE: "completed"
-};
-
 export default class TodoAction extends React.Component {
 
 

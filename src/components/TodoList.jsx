@@ -5,11 +5,12 @@ import TodoItem from "./TodoItem";
 import TodoInput from "./TodoInput";
 import TodoAction from "./TodoAction";
 import { ThemeContext } from "../context/ThemeContext";
+import Pagination from "./Pagination";
 
 const STATE_FILTER = {
-  ALL: "all",
-  ACTIVE: "active",
-  COMPLETE: "completed"
+    ALL: "all",
+    ACTIVE: "active",
+    COMPLETE: "completed"
 };
 
 export default class TodoList extends React.Component {
@@ -17,8 +18,8 @@ export default class TodoList extends React.Component {
         todos: [],
         filter: STATE_FILTER.ALL,
         editingTodo: null,
-        currentPage: 1, //  trang hiện tại
         itemsPerPage: 5, //  số todo mỗi trang
+        currentPage: 1,
     };
 
     handleAddTodo = (text) => {
@@ -93,28 +94,13 @@ export default class TodoList extends React.Component {
         if (filter === STATE_FILTER.COMPLETE) return todos.filter((t) => t.completed);
         return todos;
     };
-
+    handlePageChange = (page) => {
+        this.setState({ currentPage: page });
+    };
     // --- Pagination handlers ---
     // Phải tách ra component riêng 
     // Triển khai HOC 
-    goToNextPage = () => {
-        const totalPages = Math.ceil( // Tong so trang = TotalTodo /  So todo moi trang (5 todo)
-            this.getFilteredTodos().length / this.state.itemsPerPage
-        );
-        this.setState((prev) => ({
-            currentPage: Math.min(prev.currentPage + 1, totalPages), // khong vuot qua tong so trang
-        }));
-    };
 
-    goToPrevPage = () => {
-        this.setState((prev) => ({
-            currentPage: Math.max(prev.currentPage - 1, 1), // khong nho hon trang 1
-        }));
-    };
-
-    goToSpecificPage = (page) => { // di den trang cu the
-        this.setState({ currentPage: page });
-    };
     render() {
         const { editingTodo, todos, filter } = this.state;
         const filteredTodos = this.getFilteredTodos(); // Lọc theo trạng thái
@@ -171,13 +157,6 @@ export default class TodoList extends React.Component {
                                 onCancelEdit={this.handleCancelEdit}
                                 editingTodo={editingTodo}
                             />
-                            {/* <TodoInput2
-                                todos={todos}
-                                handleToggleTodo={this.handleToggleTodo}
-                                handleDeleteTodo={this.handleDeleteTodo}
-                                handleUpdateTodo={this.handleUpdateTodo}
-                                handleEditInInput={this.handleEditInInput}
-                            /> */}
                             {currentTodos.map((todo, idx) => (
                                 <TodoItem
                                     idx={idx}
@@ -190,42 +169,13 @@ export default class TodoList extends React.Component {
                                 />
                             ))}
                             {filteredTodos.length > 0 && (
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        gap: 2,
-                                        p: 1,
-                                    }}>
-                                    <button
-                                        onClick={this.goToPrevPage}
-                                        disabled={this.state.currentPage === 1}>
-                                        Prev
-                                    </button>
-                                    {/* Array.from({length: 5 }, (_, i) => i + 1) 
-                                    ví dụ tạo mảng độ dài 5 [1,2,3,4,5]
-                                    */}
-                                    {/* sử dụng cách khác để tạo mảng độ dài totalPages */}
-                                    {Array.from({ length: totalPages }, (_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => this.goToSpecificPage(i + 1)}
-                                            style={{
-                                                fontWeight:
-                                                    this.state.currentPage === i + 1 ? "bold" : "normal", //đúng curentPage thì in đậm
-                                            }}>
-                                            {i + 1}
-                                        </button>
-                                    ))}
-
-                                    <button
-                                        onClick={this.goToNextPage}
-                                        disabled={this.state.currentPage === totalPages}
-                                    >
-                                        Next
-                                    </button>
-                                </Box>
+                                <Pagination
+                                    totalPages={totalPages}
+                                    onPageChange={this.handlePageChange}
+                                    currentPage={this.state.currentPage}
+                                />
                             )}
+
                             {todos.length > 0 && (
                                 <TodoAction
                                     activeCount={activeCount}
