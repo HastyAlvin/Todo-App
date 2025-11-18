@@ -29,8 +29,12 @@ export default class TodoList extends React.Component {
             text,
             completed: false,
         };
-        this.setState({
-            todos: [newTodo, ...this.state.todos],
+        this.setState(prevState => { // Sử dunbgj immer để cập nhật state một cách bất biến
+            const nextTodos = produce(prevState.todos, draft => {
+                draft.unshift(newTodo); // thêm vào đầu mảng
+            });
+
+            return { todos: nextTodos };
         });
     };
     handleUpdateTodo = (idx, text) => {
@@ -38,9 +42,9 @@ export default class TodoList extends React.Component {
             // Sử dụng Immer's produce taoj ra một bản sao để cập nhật
             const nextTodos = produce(prevState.todos, draft => { //draft là bản sao tạm thời để có thể thao tác trực tiếp
                 // 1. Tìm index của Todo cần cập nhật
-                const todoIndex = draft.findIndex(t => t.id === idx); //findIndex để xác định vị trí của todo cần chỉnh sửa dựa trên id duy nhất.
+                const todoIndex = draft.findIndex(t => t.id === idx); //findIndex để xác định vị trí của todo cần chỉnh sửa dựa trên id duy nhất. findeIndex trả về -1 nếu không tìm thấy 
                 // 2. Kiểm tra và cập nhật (Thao tác an toàn nhờ Immer)
-                if (todoIndex !== -1) {
+                if (todoIndex !== -1) { //điều kiện để todoIndexx có trong mảng todoIndex !== -1 → todo tồn tại → cập nhật an toàn.
                     draft[todoIndex].text = text;
                 }
             });
