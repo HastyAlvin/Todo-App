@@ -6,6 +6,7 @@ import TodoInput from "./TodoInput";
 import TodoAction from "./TodoAction";
 import { ThemeContext } from "../context/ThemeContext";
 import Pagination from "./Pagination";
+import { produce } from 'immer';
 
 const STATE_FILTER = {
     ALL: "all",
@@ -32,24 +33,24 @@ export default class TodoList extends React.Component {
             todos: [newTodo, ...this.state.todos],
         });
     };
-
     handleUpdateTodo = (idx, text) => {
-        // this.setState({
-        //     todos: this.state.todos.map((t) =>
-        //         t.id === id ? { ...t, text } : t
-        //     ),
-        //     editingTodo: null,
-        // });
-        // const newTodos = this.state.todos.map((t, index) => {
-        //     return idx === index ? { ...t, text } : t
-        // })
+        this.setState(prevState => { // gọi state an toàn , nhận vào prevState và trả về một object là state mới
+            // Sử dụng Immer's produce taoj ra một bản sao để cập nhật
+            const nextTodos = produce(prevState.todos, draft => { //draft là bản sao tạm thời để có thể thao tác trực tiếp
+                // 1. Tìm index của Todo cần cập nhật
+                const todoIndex = draft.findIndex(t => t.id === idx); //findIndex để xác định vị trí của todo cần chỉnh sửa dựa trên id duy nhất.
+                // 2. Kiểm tra và cập nhật (Thao tác an toàn nhờ Immer)
+                if (todoIndex !== -1) {
+                    draft[todoIndex].text = text;
+                }
+            });
 
-        this.state.todos[this.idx].text = text;
-        const newTodos = this.state.todos;
-
-        this.setState({
-            todos: newTodos,
-            editingTodo: null,
+            return {
+                todos: nextTodos,
+                editingTodo: null,
+            };
+            //Hàm setState trả về một object mới, trong đó todos là mảng bất biến mới (nextTodos) do Immer tạo ra.
+            // editingTodo: null đảm bảo rằng sau khi lưu thành công, chế độ chỉnh sửa sẽ được tắt, kích hoạt render lại giao diện.
         });
     };
 

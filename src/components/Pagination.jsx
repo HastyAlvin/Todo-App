@@ -39,6 +39,7 @@ export default class Pagination extends React.Component {
         <Button
           onClick={this.goToPrevPage}
           disabled={currentPage === 1}
+          sx={{ bg: 'gray' }}
         >
           Prev
         </Button>
@@ -48,7 +49,7 @@ export default class Pagination extends React.Component {
             key={i}
             onClick={() => this.goToSpecificPage(i + 1)}
             sx={{
-              fontWeight: currentPage === i + 1 ? "bold" : "normal",
+              fontWeight: currentPage === i + 1 ? "bold" : "normal", bg: currentPage === i + 1 ? "#d2ceceffff" : ' gray'
             }}
           >
             {i + 1}
@@ -58,6 +59,8 @@ export default class Pagination extends React.Component {
         <Button
           onClick={this.goToNextPage}
           disabled={currentPage === totalPages}
+          sx={{ bg: 'gray' }}
+
         >
           Next
         </Button>

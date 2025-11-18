@@ -64,13 +64,14 @@ export default class TodoItem extends React.Component {
     }
   };
 
-  handleSaveEdit = () => {
-    const text = this.state.editValue.trim();
-    if (text !== "") {
-      this.props.onUpdate(this.props.todo.id, text);
-    }
-    this.setState({ isEditingInline: false });
-  };
+handleSaveEdit = () => {
+  const text = this.state.editValue.trim();
+  if (text !== "") {
+    // Truyền ID và text mới
+    this.props.onUpdate(this.props.todo.id, text); 
+  }
+  this.setState({ isEditingInline: false });
+};
 
   handleCancelEdit = () => {
     this.setState({ isEditingInline: false, editValue: this.props.todo.text });
