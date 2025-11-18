@@ -11,7 +11,8 @@ export default class TodoInput extends React.Component {
     };
   }
 
-  componentDidUpdate(prevProps) {
+  // Bỏ đi thì có được không?
+  componentDidUpdate(prevProps) { // hàm này được chạy sau khi render
     if (this.props.editingTodo && !prevProps.editingTodo) {
       this.setState({ inputValue: this.props.editingTodo.text });
       this.inputRef.current?.focus();
@@ -24,7 +25,7 @@ export default class TodoInput extends React.Component {
   handleChange = (e) => {
     this.setState({ inputValue: e.target.value });
   };
-
+// Xử lý khi nhấn phím đang bị lặp logic ở todoItem
   handleKeyDown = (e) => {
     const { onAdd, onUpdate, editingTodo, onCancelEdit } = this.props;
     const text = this.state.inputValue.trim();

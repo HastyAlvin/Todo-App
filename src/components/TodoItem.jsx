@@ -3,6 +3,22 @@ import React from "react";
 import { Flex, Box, Input, Button, Text } from "theme-ui";
 import { X, Edit2, Check, XCircle } from "lucide-react";
 
+
+//    handleToggleTodo = (id) => {
+//     this.setState({
+//         todos: this.state.todos.map((t) =>
+//             t.id === id ? { ...t, completed: !t.completed } : t
+//         ),
+//     });
+// };
+// handleDeleteTodo = (id) => {
+//     this.setState({
+//         todos: this.state.todos.filter((t) => t.id !== id),
+//         editingTodo:
+//             this.state.editingTodo?.id === id ? null : this.state.editingTodo,
+//     });
+// };
+// Những logic xoay quanh thì nên defin ở đây
 export default class TodoItem extends React.Component {
 
   constructor(props) {
@@ -36,6 +52,8 @@ export default class TodoItem extends React.Component {
   handleEditChange = (e) => {
     this.setState({ editValue: e.target.value });
   };
+
+  // Xử lý khi nhấn phím đang bị lặp logic ở todoInput
 
   handleEditKeyDown = (e) => {
     if (e.key === "Enter") {

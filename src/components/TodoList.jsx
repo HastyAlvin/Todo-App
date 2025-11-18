@@ -5,10 +5,17 @@ import TodoItem from "./TodoItem";
 import TodoInput from "./TodoInput";
 import TodoAction from "./TodoAction";
 import { ThemeContext } from "../context/ThemeContext";
+
+const STATE_FILTER = {
+  ALL: "all",
+  ACTIVE: "active",
+  COMPLETE: "completed"
+};
+
 export default class TodoList extends React.Component {
     state = {
         todos: [],
-        filter: "all",
+        filter: STATE_FILTER.ALL,
         editingTodo: null,
         currentPage: 1, //  trang hiện tại
         itemsPerPage: 5, //  số todo mỗi trang
@@ -82,42 +89,42 @@ export default class TodoList extends React.Component {
 
     getFilteredTodos = () => {
         const { todos, filter } = this.state;
-        if (filter === "active") return todos.filter((t) => !t.completed);
-        if (filter === "completed") return todos.filter((t) => t.completed);
+        if (filter === STATE_FILTER.ACTIVE) return todos.filter((t) => !t.completed);
+        if (filter === STATE_FILTER.COMPLETE) return todos.filter((t) => t.completed);
         return todos;
     };
 
     // --- Pagination handlers ---
+    // Phải tách ra component riêng 
+    // Triển khai HOC 
     goToNextPage = () => {
-        const totalPages = Math.ceil(
+        const totalPages = Math.ceil( // Tong so trang = TotalTodo /  So todo moi trang (5 todo)
             this.getFilteredTodos().length / this.state.itemsPerPage
         );
         this.setState((prev) => ({
-            currentPage: Math.min(prev.currentPage + 1, totalPages),
+            currentPage: Math.min(prev.currentPage + 1, totalPages), // khong vuot qua tong so trang
         }));
     };
 
     goToPrevPage = () => {
         this.setState((prev) => ({
-            currentPage: Math.max(prev.currentPage - 1, 1),
+            currentPage: Math.max(prev.currentPage - 1, 1), // khong nho hon trang 1
         }));
     };
 
-    goToSpecificPage = (page) => {
+    goToSpecificPage = (page) => { // di den trang cu the
         this.setState({ currentPage: page });
     };
     render() {
         const { editingTodo, todos, filter } = this.state;
-        // const filteredTodos = this.getFilteredTodos(); // ✅ Tính từ state
-        const activeCount = todos.filter((t) => !t.completed).length;
-
-        const filteredTodos = this.getFilteredTodos();
+        const filteredTodos = this.getFilteredTodos(); // Lọc theo trạng thái
+        const activeCount = todos.filter((t) => !t.completed).length; // 
         const totalPages = Math.ceil(
             filteredTodos.length / this.state.itemsPerPage
         );
-        const startIndex = (this.state.currentPage - 1) * this.state.itemsPerPage;
-        const endIndex = startIndex + this.state.itemsPerPage;
-        const currentTodos = filteredTodos.slice(startIndex, endIndex);
+        const startIndex = (this.state.currentPage - 1) * this.state.itemsPerPage; // chỉ số bắt đầu
+        const endIndex = startIndex + this.state.itemsPerPage; // chỉ số kết thúc
+        const currentTodos = filteredTodos.slice(startIndex, endIndex); // Lấy todo của trang hiện tại
         return (
             <ThemeContext.Consumer>
                 {({ theme }) => (
@@ -188,25 +195,25 @@ export default class TodoList extends React.Component {
                                         display: "flex",
                                         justifyContent: "center",
                                         gap: 2,
-                                        p: 3,
-                                    }}
-                                >
+                                        p: 1,
+                                    }}>
                                     <button
                                         onClick={this.goToPrevPage}
-                                        disabled={this.state.currentPage === 1}
-                                    >
+                                        disabled={this.state.currentPage === 1}>
                                         Prev
                                     </button>
-
+                                    {/* Array.from({length: 5 }, (_, i) => i + 1) 
+                                    ví dụ tạo mảng độ dài 5 [1,2,3,4,5]
+                                    */}
+                                    {/* sử dụng cách khác để tạo mảng độ dài totalPages */}
                                     {Array.from({ length: totalPages }, (_, i) => (
                                         <button
                                             key={i}
                                             onClick={() => this.goToSpecificPage(i + 1)}
                                             style={{
                                                 fontWeight:
-                                                    this.state.currentPage === i + 1 ? "bold" : "normal",
-                                            }}
-                                        >
+                                                    this.state.currentPage === i + 1 ? "bold" : "normal", //đúng curentPage thì in đậm
+                                            }}>
                                             {i + 1}
                                         </button>
                                     ))}

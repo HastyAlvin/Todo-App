@@ -35,3 +35,6 @@ export default function App() {
 // PureComponent: so sánh nông. Khi props hoặc state thay đổi thì mới render lại component
 // Nguyên tắc khi thay đổi state. Thế nào là một state mới ? 
 // Mọi logic triển khai thay đổi component thay đổi reference của từng biến từng field cần phải kiểm soát hết.
+
+//Làm thêm HOC scroll để load thêm thay cho chức năng phân trang
+// Tìm hiểu keyword
